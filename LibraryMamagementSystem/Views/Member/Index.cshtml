@@ -1,0 +1,99 @@
+﻿@model PagedList.PagedList<LibraryMamagementSystem.Models.MemberViewModel>
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "Index";
+}
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<h2>Index</h2>
+<p>
+    @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-primary btn-large" })
+</p>
+@using (Html.BeginForm("Index", "Member", FormMethod.Get))
+{<p>
+        Find By Name: @Html.TextBox("SearchString")
+        <input type="submit" value="Search" class="btn btn-primary" />
+    </p>
+
+}
+<table class="table">
+    <tr>
+        <th>
+           Mamber Name
+        </th>
+        <th>
+            Email Address
+        </th>
+        <th>
+            Date of Birth
+        </th>
+        <th>
+            Image Name
+        </th>
+        <th>
+            Image
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.MemberName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @Convert.ToString(string.Format("{0:dd/MM/yyyy}", item.DOB))
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ImageName)
+            </td>
+            <td>
+                <img src="@Url.Content(item.ImageUrl)" alt=@item.ImageName width="40" height="40" />
+            </td>
+            <td>
+                <a href="#" name="details" onclick="DetailsRecord('+@item.MemberId+')">Details</a>|
+                @Html.ActionLink("Details", "Details", new { id = item.MemberId }) |
+                @Html.ActionLink("Edit", "Edit", new { id = item.MemberId }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.MemberId })
+            </td>
+        </tr>
+    }
+</table>
+
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber)Of @Model.PageCount
+
+@Html.PagedListPager(Model, page => Url.Action("Index",
+    new { page, SortOrder = ViewBag.CurrentSort, CurrentFilter = ViewBag.CurrentFilter }))
+
+<div id="partialDiv">
+    @if (ViewBag.Details == "Show")
+    {
+        @Html.Partial("_MemberDetails", Model)
+        ViewBag.Details = "";
+    }
+
+</div>
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+<script>
+    function DetailsRecord(id) {
+        $.ajax({
+            url: "/Member/Details?Id=" + id,
+            type: 'GET',
+            data: "",
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                $("#partialDiv").show();
+                $("#partialDiv").html(data);
+            },
+            error: function () {
+                alert("Error occured");
+            }
+        })
+    }
+
+</script>

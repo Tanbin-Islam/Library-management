@@ -1,0 +1,118 @@
+﻿@model PagedList.PagedList<LibraryMamagementSystem.Models.BookViewModel>
+
+@using PagedList.Mvc;
+@using PagedList;
+
+@{
+    ViewBag.Title = "SearchSortPagingIndex";
+}
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+<script src="~/Scripts/bootstrap.min.js"></script>
+<div>
+    <h2>Search, Sort & Paging Index</h2>
+    @using (Html.BeginForm("SearchSortPagingIndex", "Book", FormMethod.Get))
+    {
+        <p>
+            Search By Name: @Html.TextBox("SearchString")
+            <input type="submit" value="Search and Sort" class="btn btn-primary" />
+        </p>
+    }
+
+    <table class="table">
+        <tr>
+            <th>
+                Book Name
+            </th>
+            <th>
+                Author Name
+            </th>
+            <th>
+                Price
+            </th>
+            <th>
+                Category
+            </th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BookName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AuthorName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CategoryName)
+                </td>
+            </tr>
+        }
+    </table>
+    Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount @Html.PagedListPager(Model, Page => Url.Action("SearchSortPagingIndex", new { Page, SortOrder = ViewBag.CurrentSort, CurrentFilter = ViewBag.CurrentFilter }))
+    <p>@Html.ActionLink("Back to List", "Index")</p>
+</div>
+
+
+@*Compare between time interval*@
+<div style="background-color: salmon">
+    <h2>
+        Book List Returned at : @DateTime.Now.ToLongTimeString()
+    </h2>
+
+    <script>
+        function Clear() {
+            $("#DivBook").empty();
+        }
+    </script>
+
+    @Ajax.ActionLink("All Book", "Index", new AjaxOptions()
+    {
+        HttpMethod = "Get",
+        UpdateTargetId = "DivBook",
+        InsertionMode = InsertionMode.Replace,
+        LoadingElementId = "progress",
+        LoadingElementDuration = 1000,
+        OnBegin = "Clear"
+    })
+    <span style="color: darksalmon">|</span>
+
+    @Ajax.ActionLink("All Book in ascending order", "AllBookAsc", new AjaxOptions()
+    {
+        HttpMethod = "Get",
+        UpdateTargetId = "DivBook",
+        InsertionMode = InsertionMode.Replace,
+        LoadingElementId = "progress",
+        LoadingElementDuration = 1000,
+        OnBegin = "Clear"
+    })
+    <span style="color: aquamarine">|</span>
+
+    @Ajax.ActionLink("All Book in descending order", "AllBookDsc", new AjaxOptions()
+    {
+        HttpMethod = "Get",
+        UpdateTargetId = "DivBook",
+        InsertionMode = InsertionMode.Replace,
+        LoadingElementId = "progress",
+        LoadingElementDuration = 1000,
+        OnBegin = "Clear"
+    })
+
+
+    <div id="progress" style="display:none">
+        <img src="~/Images/download.jpg" />
+     
+    </div>
+
+    <div id="DivBook">
+
+    </div>
+</div>
+
+
